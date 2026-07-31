@@ -66,13 +66,9 @@ class Handler(SimpleHTTPRequestHandler):
         cookie = zona_cookie(now_ms)
         errors = []
         for host in HOSTS:
-            url = host + endpoint + '?' + urllib.parse.urlencode({
-                'params': params,
-                'client_time': str(now_ms),
-            })
+            url = host + endpoint + '?' + urllib.parse.urlencode({'params': params, 'client_time': str(now_ms)})
             request = urllib.request.Request(url, headers={
                 'Accept': 'application/json',
-                'Accept-Encoding': 'gzip',
                 'Cookie': 's=' + cookie,
                 'User-Agent': 'Mozilla/5.0 (Linux; Android 11; Android TV) Zona/3.0.65',
             })
@@ -80,8 +76,8 @@ class Handler(SimpleHTTPRequestHandler):
                 with urllib.request.urlopen(request, timeout=15, context=ssl.create_default_context()) as response:
                     return self.reply(response.status, response.read(), response.headers.get_content_type())
             except urllib.error.HTTPError as error:
-                body = error.read()
-                errors.append('%s: HTTP %s %s' % (host, error.code, body[:160].decode('utf-8', 'replace')))
+                body = error.read().decode('utf-8', 'replace')
+                errors.append('%s: HTTP %s %s' % (host, error.code, body[:500]))
             except Exception as error:
                 errors.append('%s: %s' % (host, error))
         body = json.dumps({'message': 'Zona API request failed', 'details': errors}, ensure_ascii=False).encode('utf-8')
