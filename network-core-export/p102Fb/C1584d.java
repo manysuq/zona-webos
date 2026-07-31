@@ -82,27 +82,23 @@ public final class C1584d extends C1585e implements InterfaceC1587g {
         }
         if (this.f5195d == null) {
             synchronized (this) {
-                try {
-                    if (this.f5195d == null) {
-                        AtomicInteger atomicInteger = new AtomicInteger(this.f5202a.size());
-                        for (int i10 = 0; i10 < this.f5202a.size(); i10++) {
-                            String str = this.f5202a.get(i10);
-                            try {
-                                C1596p.m2213c(str, interfaceC1590j, new a(i10, str, atomicInteger));
-                            } catch (IOException unused) {
-                                atomicInteger.decrementAndGet();
-                            }
-                        }
+                if (this.f5195d == null) {
+                    AtomicInteger atomicInteger = new AtomicInteger(this.f5202a.size());
+                    for (int i10 = 0; i10 < this.f5202a.size(); i10++) {
+                        String str = this.f5202a.get(i10);
                         try {
-                            if (this.f5195d == null && atomicInteger.get() > 0) {
-                                wait();
-                            }
-                        } catch (InterruptedException e10) {
-                            throw new RuntimeException(e10);
+                            C1596p.m2213c(str, interfaceC1590j, new a(i10, str, atomicInteger));
+                        } catch (IOException unused) {
+                            atomicInteger.decrementAndGet();
                         }
                     }
-                } catch (Throwable th) {
-                    throw th;
+                    try {
+                        if (this.f5195d == null && atomicInteger.get() > 0) {
+                            wait();
+                        }
+                    } catch (InterruptedException e10) {
+                        throw new RuntimeException(e10);
+                    }
                 }
             }
         }
