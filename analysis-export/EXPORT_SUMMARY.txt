@@ -1,0 +1,2 @@
+UI resource bytes: 4772256
+Selected Java files: 350
