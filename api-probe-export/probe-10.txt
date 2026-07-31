@@ -1,0 +1,15 @@
+HOST=https://apir0.mzona.net
+PARAMS={"page":{"offset":0,"size":5},"filter":{}}
+HTTP/2 404 
+server: nginx/1.30.2
+date: Fri, 31 Jul 2026 22:57:55 GMT
+content-type: application/json
+content-length: 144
+cache-control: must-revalidate,no-cache,no-store
+
+{
+"servlet":"org.eclipse.jetty.servlet.ServletHandler$Default404Servlet-24b6b8f6",
+"message":"Not Found",
+"url":"/getMovieIds",
+"status":"404"
+}

@@ -1,0 +1,2 @@
+/tmp/zona-export/apk-resources/list.txt:300:      466  1981-01-01 01:01   META-INF/native-image/io.ktor/ktor-network/reflect-config.json
+/tmp/zona-export/apk-resources/list.txt:301:      144  1981-01-01 01:01   META-INF/native-image/okhttp/okhttp/native-image.properties

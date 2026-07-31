@@ -1,0 +1,3 @@
+HOST=https://api2.mzona.net
+PARAMS={}
+curl: (6) Could not resolve host: api2.mzona.net

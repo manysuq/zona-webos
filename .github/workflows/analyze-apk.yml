@@ -1,0 +1,163 @@
+name: Analyze Zona APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      apk_path:
+        description: Path to the APK
+        required: true
+        default: zona5.apk
+  push:
+    paths:
+      - "**/*.apk"
+      - ".github/workflows/analyze-apk.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      APK_PATH: ${{ github.event.inputs.apk_path || 'zona5.apk' }}
+      OUT_DIR: apk-analysis
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/apk-analysis
+
+      - name: Validate APK
+        run: |
+          set -euo pipefail
+          test -f "$APK_PATH"
+          mkdir -p "$OUT_DIR"
+          file "$APK_PATH" | tee "$OUT_DIR/file-type.txt"
+          sha256sum "$APK_PATH" | tee "$OUT_DIR/sha256.txt"
+          unzip -t "$APK_PATH" >/dev/null
+
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y aapt apksigner jq tree
+          JADX_URL=$(curl -fsSL https://api.github.com/repos/skylot/jadx/releases/latest | jq -r '.assets[] | select(.name | test("^jadx-[0-9].*\\.zip$")) | .browser_download_url' | head -n1)
+          mkdir -p "$RUNNER_TEMP/jadx"
+          curl -fsSL "$JADX_URL" -o "$RUNNER_TEMP/jadx.zip"
+          unzip -q "$RUNNER_TEMP/jadx.zip" -d "$RUNNER_TEMP/jadx"
+          echo "$RUNNER_TEMP/jadx/bin" >> "$GITHUB_PATH"
+          APKTOOL_URL=$(curl -fsSL https://api.github.com/repos/iBotPeaches/Apktool/releases/latest | jq -r '.assets[] | select(.name | test("^apktool_.*\\.jar$")) | .browser_download_url' | head -n1)
+          curl -fsSL "$APKTOOL_URL" -o "$RUNNER_TEMP/apktool.jar"
+          echo "APKTOOL_JAR=$RUNNER_TEMP/apktool.jar" >> "$GITHUB_ENV"
+
+      - name: Extract metadata
+        run: |
+          set +e
+          aapt dump badging "$APK_PATH" > "$OUT_DIR/aapt-badging.txt" 2>&1
+          aapt dump permissions "$APK_PATH" > "$OUT_DIR/aapt-permissions.txt" 2>&1
+          aapt dump xmltree "$APK_PATH" AndroidManifest.xml > "$OUT_DIR/manifest-tree.txt" 2>&1
+          apksigner verify --verbose --print-certs "$APK_PATH" > "$OUT_DIR/signature.txt" 2>&1
+          unzip -l "$APK_PATH" > "$OUT_DIR/archive-files.txt"
+
+      - name: Decode resources
+        run: java -jar "$APKTOOL_JAR" d -f "$APK_PATH" -o "$OUT_DIR/apktool" > "$OUT_DIR/apktool.log" 2>&1
+
+      - name: Decompile sources
+        run: |
+          set +e
+          jadx --show-bad-code --deobf -d "$OUT_DIR/jadx" "$APK_PATH" > "$OUT_DIR/jadx.log" 2>&1
+          JADX_EXIT=$?
+          echo "$JADX_EXIT" > "$OUT_DIR/jadx-exit-code.txt"
+          if [ "$JADX_EXIT" -ne 0 ]; then
+            echo "::warning::JADX finished with exit code $JADX_EXIT; partial output retained."
+            tail -n 100 "$OUT_DIR/jadx.log" || true
+          fi
+          exit 0
+
+      - name: Create reports
+        if: always()
+        run: |
+          set +e
+          tree -a -L 4 "$OUT_DIR/apktool" > "$OUT_DIR/resource-tree.txt"
+          tree -a -L 5 "$OUT_DIR/jadx" > "$OUT_DIR/source-tree.txt"
+          find "$OUT_DIR/apktool" -type f \( -name '*.so' -o -name '*.dex' \) -print > "$OUT_DIR/native-and-dex-files.txt"
+          grep -RhoEI 'https?://[^"'"'"'<>[:space:]\\]+' "$OUT_DIR/apktool" "$OUT_DIR/jadx" | sort -u > "$OUT_DIR/discovered-urls.txt"
+          grep -RniEI 'mzona|zonasearch|imgzona|zonapic|torrent|magnet|video|stream|player|kinopoisk|leanback|androidx.tv' "$OUT_DIR/jadx/sources" "$OUT_DIR/apktool/assets" "$OUT_DIR/apktool/res" > "$OUT_DIR/zona-media-references.txt" 2>/dev/null
+
+      - name: Prepare focused analysis export
+        if: always()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, shutil
+
+          out = Path('apk-analysis')
+          export = Path('analysis-export')
+          if export.exists(): shutil.rmtree(export)
+          (export / 'reports').mkdir(parents=True)
+
+          for name in ['file-type.txt','sha256.txt','aapt-badging.txt','aapt-permissions.txt','manifest-tree.txt','signature.txt','archive-files.txt','apktool.log','jadx.log','jadx-exit-code.txt','resource-tree.txt','source-tree.txt','native-and-dex-files.txt','discovered-urls.txt','zona-media-references.txt']:
+              src = out / name
+              if src.exists(): shutil.copy2(src, export / 'reports' / name)
+
+          manifest = out / 'apktool' / 'AndroidManifest.xml'
+          if manifest.exists():
+              (export / 'apktool').mkdir(parents=True, exist_ok=True)
+              shutil.copy2(manifest, export / 'apktool' / 'AndroidManifest.xml')
+
+          total = 0
+          cap = 45 * 1024 * 1024
+          per_file = 3 * 1024 * 1024
+          roots = [out/'apktool'/'res', out/'apktool'/'assets']
+          allowed = {'.xml','.png','.jpg','.jpeg','.webp','.svg','.json','.html','.css','.js','.ttf','.otf','.txt'}
+          for root in roots:
+              if not root.exists(): continue
+              for src in sorted(root.rglob('*')):
+                  if not src.is_file() or src.suffix.lower() not in allowed: continue
+                  rel = src.relative_to(out/'apktool')
+                  wanted = ('layout' in rel.parts[1] if len(rel.parts)>1 and rel.parts[0]=='res' else False) or any(p.startswith(('drawable','mipmap','values')) for p in rel.parts) or rel.parts[0]=='assets'
+                  if not wanted: continue
+                  size = src.stat().st_size
+                  if size > per_file or total + size > cap: continue
+                  dst = export/'ui-resources'/rel
+                  dst.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(src,dst); total += size
+
+          pattern = re.compile(r'mzona|zonasearch|imgzona|zonapic|torrent|magnet|video|stream|player|kinopoisk|leanback|androidx\.tv', re.I)
+          srcroot = out/'jadx'/'sources'
+          selected = 0
+          if srcroot.exists():
+              for src in sorted(srcroot.rglob('*.java')):
+                  if selected >= 350 or src.stat().st_size > 700_000: continue
+                  try: text = src.read_text(errors='ignore')
+                  except Exception: continue
+                  if not pattern.search(str(src)) and not pattern.search(text): continue
+                  rel = src.relative_to(srcroot)
+                  dst = export/'selected-sources'/rel
+                  dst.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(src,dst); selected += 1
+
+          (export/'EXPORT_SUMMARY.txt').write_text(f'UI resource bytes: {total}\nSelected Java files: {selected}\n', encoding='utf-8')
+          PY
+
+      - name: Publish focused analysis to branch
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f analysis-export
+          if git diff --cached --quiet; then
+            echo "No analysis changes to publish"
+          else
+            git commit -m "analysis: publish focused zona5 APK output [skip ci]"
+            git push origin HEAD:chore/apk-analysis
+          fi
+
+      - name: Upload artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zona-apk-analysis-${{ github.run_number }}
+          path: apk-analysis/
+          if-no-files-found: error
+          retention-days: 14

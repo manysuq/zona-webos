@@ -1,0 +1,30 @@
+package io.appmetrica.analytics.impl;
+
+import android.app.UiModeManager;
+import android.content.Context;
+import io.appmetrica.analytics.coreutils.internal.AndroidUtils;
+import io.appmetrica.analytics.coreutils.internal.services.SafePackageManager;
+import io.appmetrica.analytics.coreutils.internal.system.SystemServiceUtils;
+
+/* JADX INFO: renamed from: io.appmetrica.analytics.impl.O7 */
+/* JADX INFO: compiled from: r8-map-id-1f200e1347f0336e47a13bddf0692fda05e585487837480be1935e5057d3444b */
+/* JADX INFO: loaded from: classes3.dex */
+public abstract class AbstractC13577O7 {
+
+    /* JADX INFO: renamed from: a */
+    public static final SafePackageManager f45136a = new SafePackageManager();
+
+    /* JADX INFO: renamed from: a */
+    public static boolean m15475a(Context context) {
+        Object systemService = context.getSystemService("uimode");
+        Integer num = (Integer) SystemServiceUtils.accessSystemServiceSafelyOrDefault(systemService instanceof UiModeManager ? (UiModeManager) systemService : null, "getting current mode type", "UiModeManager", null, new C13775Vo());
+        boolean z10 = num != null && num.intValue() == 4;
+        SafePackageManager safePackageManager = f45136a;
+        return z10 || safePackageManager.hasSystemFeature(context, "android.software.leanback") || (AndroidUtils.isApiAchieved(26) ? safePackageManager.hasSystemFeature(context, "android.software.leanback_only") : false);
+    }
+
+    /* JADX INFO: renamed from: a */
+    public static final Integer m15474a(UiModeManager uiModeManager) {
+        return Integer.valueOf(uiModeManager.getCurrentModeType());
+    }
+}

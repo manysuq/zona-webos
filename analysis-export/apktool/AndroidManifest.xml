@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="36" android:compileSdkVersionCodename="16" package="mobi.zona" platformBuildVersionCode="36" platformBuildVersionName="16">
+    <uses-feature android:name="android.software.leanback" android:required="false"/>
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
+    <uses-feature android:name="android.hardware.microphone" android:required="false"/>
+    <uses-feature android:name="android.hardware.screen.portrait" android:required="false"/>
+    <permission android:name="mobi.zona.MEDIA" android:protectionLevel="signature"/>
+    <uses-permission android:name="mobi.zona.MEDIA"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="com.android.providers.tv.permission.WRITE_EPG_DATA"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
+        <intent>
+            <action android:name="com.yandex.auth.action.YA_SDK_LOGIN"/>
+        </intent>
+        <package android:name="com.yandex.browser"/>
+        <package android:name="ru.yandex.searchplugin"/>
+        <package android:name="com.yandex.searchapp"/>
+        <package android:name="ru.yandex.taxi"/>
+        <package android:name="ru.yandex.mail"/>
+        <package android:name="ru.yandex.disk"/>
+        <package android:name="com.yandex.bank"/>
+        <package android:name="ru.yandex.key"/>
+        <package android:name="ru.yandex.auth.client"/>
+        <package android:name="com.google.android.gms.policy_cast_dynamite"/>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="http"/>
+        </intent>
+        <package android:name="com.google.android.apps.tv.launcherx"/>
+        <package android:name="com.google.android.tvlauncher"/>
+        <package android:name="com.google.android.tvrecommendations"/>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="tg"/>
+        </intent>
+    </queries>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION"/>
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID"/>
+    <uses-permission android:name="android.permission.AD_SERVICES_CONFIG"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="com.android.providers.tv.permission.READ_EPG_DATA"/>
+    <permission android:name="mobi.zona.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" android:protectionLevel="signature"/>
+    <uses-permission android:name="mobi.zona.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
+    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE"/>
+    <application android:allowBackup="true" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:banner="@drawable/ic_banner" android:extractNativeLibs="true" android:icon="@mipmap/zona" android:label="@string/app_name" android:largeHeap="true" android:name="ru.zona.app.android.App" android:networkSecurityConfig="@xml/network_security_config" android:roundIcon="@mipmap/zona" android:supportsRtl="true" android:theme="@style/Theme.Zona">
+        <meta-data android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME" android:value="androidx.media3.cast.DefaultCastOptionsProvider"/>
+        <activity android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize" android:exported="true" android:launchMode="singleTask" android:name="ru.zona.app.android.MainActivity" android:supportsPictureInPicture="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:host="www.kinopoisk.ru" android:pathPrefix="/series" android:scheme="https"/>
+                <data android:host="www.kinopoisk.ru" android:pathPrefix="/film" android:scheme="https"/>
+                <data android:host="*.zona.plus" android:pathPrefix="/movies" android:scheme="https"/>
+                <data android:host="*.zona.plus" android:pathPrefix="/tvseries" android:scheme="https"/>
+                <data android:host="*.getz.tv" android:pathPrefix="/e" android:scheme="https"/>
+                <data android:host="*.zon.im" android:pathPrefix="/e" android:scheme="https"/>
+                <data android:host="zonadro.id" android:pathPrefix="/e" android:scheme="https"/>
+                <data android:scheme="https"/>
+                <data android:host="mobi.zona"/>
+                <data android:pathPrefix="/movie"/>
+                <data android:pathPrefix="/serial"/>
+                <data android:pathPrefix="/channel"/>
+                <data android:host="az1.zona.pub" android:pathPrefix="/v1/auth" android:scheme="https"/>
+                <data android:host="app521295504-login.tg.dev"/>
+                <data android:pathPrefix="/tglogin"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+            </intent-filter>
+            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable"/>
+        </activity>
+        <service android:exported="false" android:name="ru.zona.app.android.system.ZonaMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/zona"/>
+        <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/content_back_color"/>
+        <provider android:authorities="mobi.zona.TvSearchProvider" android:exported="true" android:name="ru.zona.app.android.tv.search.TvSearchProvider"/>
+        <provider android:authorities="mobi.zona.provider" android:exported="false" android:grantUriPermissions="true" android:name="androidx.core.content.FileProvider">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths"/>
+        </provider>
+        <receiver android:exported="false" android:name="ru.zona.app.pip.PlayerActionReceiver"/>
+        <service android:directBootAware="true" android:exported="false" android:name="androidx.room.MultiInstanceInvalidationService"/>
+        <provider android:authorities="mobi.zona.androidx-startup" android:exported="false" android:name="androidx.startup.InitializationProvider">
+            <meta-data android:name="androidx.work.WorkManagerInitializer" android:value="androidx.startup"/>
+            <meta-data android:name="androidx.emoji2.text.EmojiCompatInitializer" android:value="androidx.startup"/>
+            <meta-data android:name="androidx.lifecycle.ProcessLifecycleInitializer" android:value="androidx.startup"/>
+            <meta-data android:name="androidx.profileinstaller.ProfileInstallerInitializer" android:value="androidx.startup"/>
+            <meta-data android:name="okhttp3.internal.platform.PlatformInitializer" android:value="androidx.startup"/>
+        </provider>
+        <service android:directBootAware="false" android:enabled="@bool/enable_system_alarm_service_default" android:exported="false" android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"/>
+        <service android:directBootAware="false" android:enabled="@bool/enable_system_job_service_default" android:exported="true" android:name="androidx.work.impl.background.systemjob.SystemJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:directBootAware="false" android:enabled="@bool/enable_system_foreground_service_default" android:exported="false" android:name="androidx.work.impl.foreground.SystemForegroundService"/>
+        <receiver android:directBootAware="false" android:enabled="true" android:exported="false" android:name="androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver"/>
+        <receiver android:directBootAware="false" android:enabled="false" android:exported="false" android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxy">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:directBootAware="false" android:enabled="false" android:exported="false" android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryNotLowProxy">
+            <intent-filter>
+                <action android:name="android.intent.action.BATTERY_OKAY"/>
+                <action android:name="android.intent.action.BATTERY_LOW"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:directBootAware="false" android:enabled="false" android:exported="false" android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$StorageNotLowProxy">
+            <intent-filter>
+                <action android:name="android.intent.action.DEVICE_STORAGE_LOW"/>
+                <action android:name="android.intent.action.DEVICE_STORAGE_OK"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:directBootAware="false" android:enabled="false" android:exported="false" android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$NetworkStateProxy">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:directBootAware="false" android:enabled="false" android:exported="false" android:name="androidx.work.impl.background.systemalarm.RescheduleReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.TIME_SET"/>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:directBootAware="false" android:enabled="@bool/enable_system_alarm_service_default" android:exported="false" android:name="androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver">
+            <intent-filter>
+                <action android:name="androidx.work.impl.background.systemalarm.UpdateProxies"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:directBootAware="false" android:enabled="true" android:exported="true" android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver" android:permission="android.permission.DUMP">
+            <intent-filter>
+                <action android:name="androidx.work.diagnostics.REQUEST_DIAGNOSTICS"/>
+            </intent-filter>
+        </receiver>
+        <activity android:label="" android:name="com.yandex.authsdk.internal.AuthSdkActivity" android:theme="@style/Theme.AuthSdk.Transparent"/>
+        <activity android:launchMode="singleTop" android:name="com.yandex.authsdk.internal.ChromeTabLoginActivity" android:theme="@style/Theme.AuthSdk.Transparent"/>
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:name="com.yandex.authsdk.internal.WebViewLoginActivity" android:theme="@style/Theme.AuthSdk"/>
+        <activity android:exported="true" android:name="com.yandex.authsdk.internal.ChromeTabDataActivity" android:theme="@style/Theme.AuthSdk.Transparent">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:host="yx081856cfa0ff4c4bacd5fa9e557bd9c8.oauth.yandex.ru"/>
+                <data android:path="/auth/finish"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:path="/auth/finish" android:scheme="yx081856cfa0ff4c4bacd5fa9e557bd9c8"/>
+            </intent-filter>
+        </activity>
+        <activity-alias android:enabled="true" android:exported="true" android:name="com.yandex.authsdk.YandexOauthClientIdActivity" android:targetActivity="com.yandex.authsdk.internal.ChromeTabDataActivity"/>
+        <meta-data android:name="com.yandex.auth.CLIENT_ID" android:value="081856cfa0ff4c4bacd5fa9e557bd9c8"/>
+        <meta-data android:name="com.yandex.auth.OAUTH_HOST" android:value="oauth.yandex.ru"/>
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" android:enableOnBackInvokedCallback="false" android:name="com.yandex.mobile.ads.common.AdActivity" android:theme="@style/MonetizationAdsInternal.AdActivity"/>
+        <provider android:authorities="mobi.zona.MobileAdsInitializeProvider" android:exported="false" android:name="com.yandex.mobile.ads.core.initializer.MobileAdsInitializeProvider"/>
+        <activity android:enableOnBackInvokedCallback="false" android:exported="false" android:name="com.yandex.mobile.ads.features.debugpanel.ui.IntegrationInspectorActivity" android:theme="@style/DebugPanelTheme"/>
+        <provider android:authorities="mobi.zona.monetization.ads.inspector.fileprovider" android:exported="false" android:grantUriPermissions="true" android:name="com.yandex.mobile.ads.features.debugpanel.data.local.DebugPanelFileProvider">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/debug_panel_file_paths"/>
+        </provider>
+        <meta-data android:name="com.google.android.gms.ads.AD_MANAGER_APP" android:value="true"/>
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
+        <receiver android:exported="false" android:name="com.google.android.gms.cast.framework.media.MediaIntentReceiver"/>
+        <service android:exported="false" android:name="com.google.android.gms.cast.framework.ReconnectionService"/>
+        <activity android:exported="false" android:name="com.google.android.tv.ads.controls.FallbackImageActivity" android:theme="@style/Theme.AppCompat.NoActionBar.Translucent"/>
+        <service android:enabled="true" android:exported="false" android:name="io.appmetrica.analytics.internal.AppMetricaService">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="io.appmetrica.analytics.IAppMetricaService"/>
+                <data android:scheme="appmetrica"/>
+            </intent-filter>
+        </service>
+        <provider android:authorities="mobi.zona.appmetrica.preloadinfo.retail" android:enabled="true" android:exported="true" android:name="io.appmetrica.analytics.internal.PreloadInfoContentProvider"/>
+        <receiver android:exported="true" android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+            </intent-filter>
+            <meta-data android:name="com.google.android.gms.cloudmessaging.FINISHED_AFTER_HANDLED" android:value="true"/>
+        </receiver>
+        <service android:directBootAware="true" android:exported="false" android:name="com.google.firebase.messaging.FirebaseMessagingService">
+            <intent-filter android:priority="-500">
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service android:directBootAware="true" android:exported="false" android:name="com.google.firebase.components.ComponentDiscoveryService">
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingKtxRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsKtxRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonLegacyRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+        </service>
+        <activity android:exported="false" android:name="com.google.android.gms.common.api.GoogleApiActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <provider android:authorities="mobi.zona.firebaseinitprovider" android:directBootAware="true" android:exported="false" android:initOrder="100" android:name="com.google.firebase.provider.FirebaseInitProvider"/>
+        <provider android:authorities="mobi.zona.resources.AndroidContextProvider" android:enabled="true" android:exported="false" android:name="org.jetbrains.compose.resources.AndroidContextProvider"/>
+        <activity android:exported="true" android:name="androidx.compose.ui.tooling.PreviewActivity"/>
+        <receiver android:directBootAware="false" android:enabled="true" android:exported="true" android:name="androidx.profileinstaller.ProfileInstallReceiver" android:permission="android.permission.DUMP">
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.SKIP_FILE"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION"/>
+            </intent-filter>
+        </receiver>
+        <service android:exported="false" android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery">
+            <meta-data android:name="backend:com.google.android.datatransport.cct.CctBackendFactory" android:value="cct"/>
+        </service>
+        <service android:exported="false" android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <receiver android:exported="false" android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"/>
+    </application>
+</manifest>

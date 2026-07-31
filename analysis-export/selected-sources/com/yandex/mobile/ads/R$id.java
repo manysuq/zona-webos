@@ -1,0 +1,53 @@
+package com.yandex.mobile.ads;
+
+/* JADX INFO: loaded from: classes3.dex */
+public final class R$id {
+    public static final int ad_position = 2131361864;
+    public static final int adtune_background_view = 2131361870;
+    public static final int adtune_content_container = 2131361871;
+    public static final int adtune_drag_view_container = 2131361872;
+    public static final int adtune_webview_container = 2131361873;
+    public static final int call_to_action = 2131361925;
+    public static final int domain = 2131362003;
+    public static final int favicon = 2131362081;
+    public static final int feedback = 2131362083;
+    public static final int instream_call_to_action = 2131362128;
+    public static final int instream_cta_container = 2131362129;
+    public static final int instream_mute = 2131362130;
+    public static final int instream_progress_display_view = 2131362131;
+    public static final int instream_skip = 2131362132;
+    public static final int item_ad_unit_format = 2131362136;
+    public static final int item_ad_unit_id = 2131362137;
+    public static final int item_button = 2131362138;
+    public static final int item_divider = 2131362139;
+    public static final int item_info_first = 2131362140;
+    public static final int item_info_second = 2131362142;
+    public static final int item_logo = 2131362143;
+    public static final int item_mediation_adapter = 2131362144;
+    public static final int item_name = 2131362145;
+    public static final int item_subtitle = 2131362146;
+    public static final int item_switch = 2131362147;
+    public static final int item_text = 2131362148;
+    public static final int item_title = 2131362149;
+    public static final int item_warning_button = 2131362151;
+    public static final int left_scroll_control_button = 2131362156;
+    public static final int loading_view = 2131362169;
+    public static final int navigation_icon = 2131362241;
+    public static final int qrcode_container = 2131362273;
+    public static final int qrcode_image = 2131362274;
+    public static final int recycler_view = 2131362281;
+    public static final int right_scroll_control_button = 2131362287;
+    public static final int sponsored = 2131362331;
+    public static final int sponsored_image = 2131362334;
+    public static final int timer_value = 2131362388;
+    public static final int toolbar_navigation_button = 2131362395;
+    public static final int toolbar_share_button = 2131362396;
+    public static final int toolbar_title = 2131362397;
+    public static final int trademark_delimiter = 2131362402;
+    public static final int trademark_icon = 2131362403;
+    public static final int vast_ad_banner_creative = 2131362416;
+    public static final int video_count_down_control = 2131362418;
+    public static final int video_mute_control = 2131362420;
+    public static final int video_progress_control = 2131362421;
+    public static final int warning = 2131362431;
+}

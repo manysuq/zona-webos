@@ -1,0 +1,49 @@
+name: Test Zona authenticated proxy
+on:
+  workflow_dispatch:
+  push:
+    paths: ["dev-server.py", "js/api.js", ".github/workflows/test-zona-proxy.yml"]
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/apk-analysis
+      - name: Syntax checks
+        run: |
+          python -m py_compile dev-server.py
+          node --check js/api.js
+      - name: Start proxy and query real catalog
+        run: |
+          python dev-server.py 8080 > /tmp/zona-proxy.log 2>&1 &
+          PID=$!
+          trap 'kill $PID || true' EXIT
+          sleep 2
+          curl -sS --max-time 90 -D proxy-response-headers.txt \
+            --get --data-urlencode 'endpoint=/getMovieIds' \
+            --data-urlencode 'params={"page":{"limit":5,"offset":0},"filter":{}}' \
+            http://127.0.0.1:8080/zona-api > proxy-response.json || true
+          cat /tmp/zona-proxy.log > proxy-server.log
+          python - <<'PY'
+          import json
+          with open('proxy-response.json', encoding='utf-8') as f:
+              payload=json.load(f)
+          if not isinstance(payload.get('data'), list) or not payload['data']:
+              raise SystemExit('Zona catalog response has no data: '+json.dumps(payload, ensure_ascii=False)[:1000])
+          print('Received', len(payload['data']), 'Zona ids')
+          PY
+      - name: Publish diagnostic result
+        if: always()
+        run: |
+          mkdir -p proxy-test-export
+          cp proxy-response.json proxy-response-headers.txt proxy-server.log proxy-test-export/ 2>/dev/null || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f proxy-test-export
+          git commit -m "test: record Zona proxy response [skip ci]" || exit 0
+          git pull --rebase origin chore/apk-analysis
+          git push origin HEAD:chore/apk-analysis

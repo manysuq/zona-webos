@@ -1,0 +1,47 @@
+package com.google.ads.interactivemedia.p508v3.impl.data;
+
+import com.google.ads.interactivemedia.p508v3.api.AdsRenderingSettings;
+import com.google.ads.interactivemedia.p508v3.api.UiElement;
+import com.google.ads.interactivemedia.p508v3.internal.zzps;
+import com.google.ads.interactivemedia.p508v3.internal.zzrm;
+import com.google.ads.interactivemedia.p508v3.internal.zzrr;
+import javax.annotation.Nullable;
+
+/* JADX INFO: compiled from: r8-map-id-1f200e1347f0336e47a13bddf0692fda05e585487837480be1935e5057d3444b */
+/* JADX INFO: loaded from: classes.dex */
+@zzps(zza = zzn.class)
+public abstract class zzg {
+    public static zzf builder(AdsRenderingSettings adsRenderingSettings) {
+        zzh zzhVar = (zzh) adsRenderingSettings;
+        zzl zzlVar = new zzl();
+        zzlVar.setBitrate(zzhVar.getBitrateKbps());
+        zzlVar.setDisableUi(zzhVar.getDisableUi());
+        zzlVar.setEnablePreloading(zzhVar.getEnablePreloading());
+        zzlVar.setEnableFocusSkipButton(zzhVar.getFocusSkipButtonWhenAvailable());
+        zzlVar.setLoadVideoTimeout(zzhVar.getLoadVideoTimeout());
+        zzlVar.setMimeTypes(zzhVar.getMimeTypes());
+        zzlVar.setPlayAdsAfterTime(zzhVar.getPlayAdsAfterTime());
+        zzlVar.setUiElements(zzhVar.getUiElements());
+        return zzlVar;
+    }
+
+    public abstract int bitrate();
+
+    public abstract boolean disableUi();
+
+    public abstract boolean enableFocusSkipButton();
+
+    public abstract boolean enablePreloading();
+
+    public abstract int loadVideoTimeout();
+
+    @Nullable
+    public abstract zzrm<String> mimeTypes();
+
+    public abstract double playAdsAfterTime();
+
+    public abstract zzf toBuilder();
+
+    @Nullable
+    public abstract zzrr<UiElement> uiElements();
+}

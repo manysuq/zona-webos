@@ -1,0 +1,40 @@
+name: Extract targeted Zona API classes
+on:
+  workflow_dispatch:
+  push:
+    paths: [".github/workflows/extract-targeted-api.yml"]
+permissions:
+  contents: write
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/apk-analysis
+      - name: Install JADX
+        run: |
+          URL=$(curl -fsSL https://api.github.com/repos/skylot/jadx/releases/latest | jq -r '.assets[] | select(.name | test("^jadx-[0-9].*\\.zip$")) | .browser_download_url' | head -n1)
+          mkdir -p /tmp/jadx-bin targeted-api-export
+          curl -fsSL "$URL" -o /tmp/jadx.zip
+          unzip -q /tmp/jadx.zip -d /tmp/jadx-bin
+      - name: Extract exact classes
+        run: |
+          rm -rf targeted-api-export && mkdir targeted-api-export
+          for cls in \
+            p179Jg.C2636o p179Jg.C2606B p179Jg.C2631j p179Jg.C2614J \
+            p102Fb.C1584d p341Sg.C4938a p341Sg.C4939b p341Sg.C4940c \
+            p341Sg.C4941d p341Sg.C4942e p341Sg.C4943f p341Sg.C4944g \
+            p341Sg.C4945h p341Sg.C4947j; do
+            out="targeted-api-export/${cls//./_}.java"
+            /tmp/jadx-bin/bin/jadx --single-class "$cls" --single-class-output "$out" zona5.apk >/dev/null 2>&1 || true
+          done
+          ls -la targeted-api-export > targeted-api-export/files.txt
+      - name: Publish
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f targeted-api-export
+          git commit -m "analysis: export targeted Zona API classes [skip ci]" || exit 0
+          git push origin HEAD:chore/apk-analysis
