@@ -27,20 +27,29 @@ jobs:
       - name: Export protocol classes
         run: |
           rm -rf network-core-export
-          mkdir -p network-core-export
+          mkdir -p network-core-export/metadata-callers
           for rel in \
             p897zg/C20958c.java p897zg/C20963h.java p897zg/InterfaceC20965j.java \
-            p102Fb/C1583c.java p431Xg/C6368g.java p031Bc/C0392h.java \
-            p064D9/C1084f.java p064D9/C1086h.java p154I9/C2295I.java; do
+            p102Fb/C1583c.java p102Fb/C1584d.java p431Xg/C6368g.java p031Bc/C0392h.java \
+            p064D9/C1084f.java p064D9/C1086h.java p154I9/C2295I.java \
+            p179Jg/C2636o.java p179Jg/C2606B.java p179Jg/C2631j.java p179Jg/C2614J.java \
+            p341Sg/C4938a.java p341Sg/C4939b.java p341Sg/C4940c.java p341Sg/C4941d.java \
+            p341Sg/C4942e.java p341Sg/C4943f.java p341Sg/C4944g.java p341Sg/C4945h.java p341Sg/C4947j.java \
+            p863xg/C19688d.java p863xg/C19689e.java; do
             src="/tmp/zona-jadx/sources/$rel"
             if [ -f "$src" ]; then mkdir -p "network-core-export/$(dirname "$rel")"; cp "$src" "network-core-export/$rel"; fi
           done
-          grep -RniE 'http|client_time|Cookie|Content-Type|POST|GET|host|params|zonasearch|mzona' network-core-export > network-core-export/protocol-references.txt || true
+          grep -RIlE 'getMetadata|m2185d' /tmp/zona-jadx/sources | while read -r src; do
+            rel=${src#/tmp/zona-jadx/sources/}
+            mkdir -p "network-core-export/metadata-callers/$(dirname "$rel")"
+            cp "$src" "network-core-export/metadata-callers/$rel"
+          done
+          grep -RniE 'http|client_time|Cookie|Content-Type|POST|GET|host|params|zonasearch|mzona|getMetadata|m2185d' network-core-export > network-core-export/protocol-references.txt || true
           cp /tmp/jadx-network.log network-core-export/jadx.log
       - name: Publish
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f network-core-export
-          git commit -m "analysis: export Zona network protocol [skip ci]" || exit 0
+          git commit -m "analysis: extend Zona network protocol export [skip ci]" || exit 0
           git push origin HEAD:chore/apk-analysis
