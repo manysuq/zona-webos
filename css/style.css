@@ -1,0 +1,557 @@
+/* -------------------------------------------------------------
+ * Zona Smart TV UI Design System for LG WebOS 4
+ * Resolution: 1920x1080
+ * ------------------------------------------------------------- */
+
+:root {
+  --bg-dark: #0a0c14;
+  --bg-surface: rgba(22, 26, 42, 0.75);
+  --bg-card: rgba(30, 36, 60, 0.6);
+  --accent-cyan: #00d2ff;
+  --accent-blue: #0066ff;
+  --accent-gradient: linear-gradient(135deg, #00d2ff 0%, #0066ff 100%);
+  --text-primary: #ffffff;
+  --text-secondary: #9aa3c4;
+  --text-muted: #646f90;
+  --focus-glow: 0 0 30px rgba(0, 210, 255, 0.65);
+  --font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 18px;
+}
+
+/* Base Layout Structure */
+#app-root {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  background: radial-gradient(circle at 70% 20%, #151a30 0%, #0a0c14 70%);
+  overflow: hidden;
+}
+
+/* Background Backdrop Hero Image */
+.hero-backdrop-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 650px;
+  background-size: cover;
+  background-position: center top;
+  transition: background-image 0.5s ease-in-out;
+  z-index: 1;
+}
+
+/* Header & Navigation Bar */
+.navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 80px;
+  z-index: 10;
+  background: linear-gradient(to bottom, rgba(10, 12, 20, 0.9) 0%, rgba(10, 12, 20, 0) 100%);
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.brand-logo img {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+}
+
+.brand-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-tab {
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.nav-tab.active {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Hero Section Info */
+.hero-content {
+  position: absolute;
+  top: 140px;
+  left: 80px;
+  width: 800px;
+  z-index: 5;
+}
+
+.hero-title {
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 20px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.rating-badge {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 193, 7, 0.4);
+}
+
+.hero-desc {
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 20px;
+}
+
+.btn-primary {
+  padding: 16px 36px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(0, 114, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-secondary {
+  padding: 16px 36px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 40px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+/* Catalog Grid Container */
+.main-content {
+  position: absolute;
+  top: 480px;
+  left: 0;
+  width: 100%;
+  height: 600px;
+  padding: 0 80px 40px 80px;
+  z-index: 5;
+  overflow-y: auto;
+}
+
+.catalog-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 30px;
+  padding-bottom: 60px;
+}
+
+/* Poster Cards */
+.poster-card {
+  position: relative;
+  background: var(--bg-card);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.poster-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 360px;
+  overflow: hidden;
+  background: #121524;
+}
+
+.poster-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(10, 12, 20, 0.85);
+  color: #ffc107;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+}
+
+.card-info {
+  padding: 16px;
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 6px;
+}
+
+.card-sub {
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+/* Live TV Channel Cards */
+.channel-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border: 2px solid transparent;
+  height: 220px;
+}
+
+.channel-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.channel-logo img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+
+.channel-name {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.channel-live-badge {
+  font-size: 14px;
+  color: #ff4757;
+  font-weight: 700;
+}
+
+/* SPATIAL NAVIGATION FOCUS STATE FOR TV REMOTE */
+.focusable.focused {
+  outline: none;
+  transform: scale(1.08);
+  border-color: var(--accent-cyan) !important;
+  box-shadow: var(--focus-glow);
+  z-index: 20;
+}
+
+.nav-tab.focusable.focused {
+  background: var(--accent-gradient);
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+/* Search Bar */
+.search-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.search-input {
+  flex: 1;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 30px;
+  padding: 0 30px;
+  font-size: 22px;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.search-btn {
+  height: 60px;
+  padding: 0 40px;
+  border-radius: 30px;
+}
+
+/* Detail Modal Window */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  background: rgba(8, 10, 18, 0.88);
+  backdrop-filter: blur(20px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-dialog {
+  position: relative;
+  width: 1200px;
+  background: rgba(22, 26, 44, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  padding: 48px;
+  display: flex;
+  gap: 48px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.modal-poster-col {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+.modal-poster-col img {
+  width: 100%;
+  height: 480px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.modal-info-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-title {
+  font-size: 42px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.modal-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 20px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.modal-desc {
+  font-size: 20px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+}
+
+.modal-sources-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.modal-sources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.btn-source {
+  padding: 16px 24px;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Fullscreen Media Player */
+.player-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  background: #000000;
+  z-index: 200;
+}
+
+.player-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.player-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 40px 80px;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+
+.player-info {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.player-progress-wrapper {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.player-progress-filled {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-gradient);
+}
+
+.player-time-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 20px;
+  color: var(--text-secondary);
+}
+
+.player-btns-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.player-control-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid transparent;
+  color: #fff;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Utilities */
+.hidden {
+  display: none !important;
+}
+
+.loading-spinner {
+  display: inline-block;
+  font-size: 20px;
+  color: var(--accent-cyan);
+}
