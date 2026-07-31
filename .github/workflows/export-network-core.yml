@@ -30,9 +30,10 @@ jobs:
           mkdir -p network-core-export/metadata-callers
           for rel in \
             p897zg/C20958c.java p897zg/C20963h.java p897zg/InterfaceC20965j.java \
-            p102Fb/C1583c.java p102Fb/C1584d.java p431Xg/C6368g.java p031Bc/C0392h.java \
+            p102Fb/C1583c.java p102Fb/C1584d.java p102Fb/C1596p.java p431Xg/C6368g.java p031Bc/C0392h.java \
             p064D9/C1084f.java p064D9/C1086h.java p154I9/C2295I.java \
-            p179Jg/C2636o.java p179Jg/C2606B.java p179Jg/C2631j.java p179Jg/C2614J.java \
+            p125Gg/C1911s.java p233Mg/C3578p.java p233Mg/C3582t.java \
+            p179Jg/C2627f.java p179Jg/C2623b.java p179Jg/C2636o.java p179Jg/C2606B.java p179Jg/C2631j.java p179Jg/C2614J.java \
             p341Sg/C4938a.java p341Sg/C4939b.java p341Sg/C4940c.java p341Sg/C4941d.java \
             p341Sg/C4942e.java p341Sg/C4943f.java p341Sg/C4944g.java p341Sg/C4945h.java p341Sg/C4947j.java \
             p863xg/C19688d.java p863xg/C19689e.java; do
@@ -51,6 +52,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f network-core-export
-          git commit -m "analysis: extend Zona network protocol export [skip ci]" || exit 0
+          git commit -m "analysis: export remaining Zona API models [skip ci]" || exit 0
           git pull --rebase origin chore/apk-analysis
           git push origin HEAD:chore/apk-analysis
