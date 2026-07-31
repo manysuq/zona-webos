@@ -1,0 +1,63 @@
+name: Build webOS IPK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "appinfo.json"
+      - "index.html"
+      - "css/**"
+      - "js/**"
+      - ".github/workflows/build-ipk.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install webOS CLI
+        run: npm install --global @webos-tools/cli
+
+      - name: Prepare clean package directory
+        run: |
+          set -euo pipefail
+          rm -rf package dist
+          mkdir -p package/css package/js
+          cp appinfo.json index.html package/
+          cp -R css/. package/css/
+          cp -R js/. package/js/
+          logo_dir="package/analysis-export/ui-resources/assets/composeResources/ru.zona.common.generated.resources/drawable"
+          icon_dir="package/analysis-export/ui-resources/res/mipmap-xxxhdpi"
+          mkdir -p "$logo_dir" "$icon_dir"
+          cp analysis-export/ui-resources/assets/composeResources/ru.zona.common.generated.resources/drawable/zona.png "$logo_dir/zona.png"
+          cp analysis-export/ui-resources/res/mipmap-xxxhdpi/zona.png "$icon_dir/zona.png"
+
+      - name: Validate JavaScript
+        run: |
+          node --check package/js/api.js
+          node --check package/js/navigation.js
+          node --check package/js/player.js
+          node --check package/js/app.js
+
+      - name: Build IPK
+        run: |
+          mkdir -p dist
+          ares-package package -o dist
+          ls -lh dist
+
+      - name: Upload IPK
+        uses: actions/upload-artifact@v4
+        with:
+          name: zona-webos-ipk-${{ github.run_number }}
+          path: dist/*.ipk
+          if-no-files-found: error
+          retention-days: 14
