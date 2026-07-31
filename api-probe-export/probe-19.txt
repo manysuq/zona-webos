@@ -1,0 +1,14 @@
+HOST=https://apiw1.mzona.net
+PARAMS={"page":0,"pageSize":5}
+HTTP/2 404 
+server: nginx
+date: Fri, 31 Jul 2026 22:58:01 GMT
+content-type: application/json
+content-length: 163
+cache-control: must-revalidate,no-cache,no-store
+
+{
+"message":"Not Found",
+"url":"http://api1.mzona.net/getMovieIds?params=%7b%22page%22%3a0%2c%22pageSize%22%3a5%7d&amp;client_time=1785538671450",
+"status":"404"
+}
