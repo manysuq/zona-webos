@@ -1,4 +1,4 @@
-name: Extract Zona builtin config resource
+name: Extract Zona settings config bytes
 on:
   workflow_dispatch:
   push:
@@ -6,45 +6,38 @@ on:
 permissions:
   contents: write
 jobs:
-  export:
+  extract:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
           ref: chore/apk-analysis
           fetch-depth: 0
-      - name: Install JADX
+      - name: Extract exact Compose resource
         run: |
-          URL=$(curl -fsSL https://api.github.com/repos/skylot/jadx/releases/latest | jq -r '.assets[] | select(.name | test("^jadx-[0-9].*\\.zip$")) | .browser_download_url' | head -n1)
-          mkdir -p /tmp/jadx-bin /tmp/zona-jadx /tmp/zona-export
-          curl -fsSL "$URL" -o /tmp/jadx.zip
-          unzip -q /tmp/jadx.zip -d /tmp/jadx-bin
-      - name: Decompile and extract APK resources
-        run: |
-          set +e
-          /tmp/jadx-bin/bin/jadx --show-bad-code --deobf -d /tmp/zona-jadx zona5.apk >/tmp/jadx-resource.log 2>&1
-          exit 0
-      - name: Collect exact resource factory
-        run: |
-          mkdir -p /tmp/zona-export/models /tmp/zona-export/apk-resources
-          for rel in p275P4/C4112o.java p689mb/C16953C.java p689mb/C16961K.java p689mb/C16972W.java; do
-            src="/tmp/zona-jadx/sources/$rel"
-            if [ -f "$src" ]; then mkdir -p "/tmp/zona-export/models/$(dirname "$rel")"; cp "$src" "/tmp/zona-export/models/$rel"; fi
-          done
-          unzip -l zona5.apk > /tmp/zona-export/apk-resources/list.txt
-          unzip -q zona5.apk 'composeResources/*' -d /tmp/apk-unpacked || true
-          if [ -d /tmp/apk-unpacked/composeResources ]; then cp -R /tmp/apk-unpacked/composeResources /tmp/zona-export/apk-resources/; fi
-          grep -RnaE 'api|config|mzona|zonasearch|http' /tmp/zona-export/apk-resources > /tmp/zona-export/resource-hits.txt || true
-          cp /tmp/jadx-resource.log /tmp/zona-export/jadx.log
-      - name: Publish from latest branch head
+          set -eux
+          rm -rf /tmp/zona-config && mkdir -p /tmp/zona-config
+          unzip -p zona5.apk assets/composeResources/ru.zona.common.generated.resources/values/strings.commonMain.cvr > /tmp/zona-config/strings.commonMain.cvr
+          dd if=/tmp/zona-config/strings.commonMain.cvr of=/tmp/zona-config/settings_string.bin bs=1 skip=36385 count=1191 status=none
+          python3 - <<'PY'
+          from pathlib import Path
+          b=Path('/tmp/zona-config/settings_string.bin').read_bytes()
+          Path('/tmp/zona-config/settings_string.hex.txt').write_text(b.hex()+'\n')
+          Path('/tmp/zona-config/settings_string.repr.txt').write_text(repr(b)+'\n')
+          for enc in ('utf-8','utf-16le','utf-16be'):
+              try:
+                  Path(f'/tmp/zona-config/settings_string.{enc}.txt').write_text(b.decode(enc))
+              except Exception as e:
+                  Path(f'/tmp/zona-config/settings_string.{enc}.txt').write_text('decode failed: '+repr(e))
+          PY
+      - name: Publish result
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin chore/apk-analysis
-          rm -rf network-core-export/models network-core-export/apk-resources network-core-export/resource-hits.txt
-          mkdir -p network-core-export
-          cp -R /tmp/zona-export/. network-core-export/
-          git add -f network-core-export
-          git commit -m "analysis: extract Zona builtin config resource [skip ci]" || exit 0
+          rm -rf network-core-export/builtin-config
+          mkdir -p network-core-export/builtin-config
+          cp /tmp/zona-config/settings_string.* network-core-export/builtin-config/
+          git add -f network-core-export/builtin-config
+          git commit -m "analysis: extract Zona settings config bytes [skip ci]" || exit 0
           git push origin HEAD:chore/apk-analysis
