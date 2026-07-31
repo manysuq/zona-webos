@@ -1,4 +1,4 @@
-name: Export Zona native config loader
+name: Extract Zona builtin config resource
 on:
   workflow_dispatch:
   push:
@@ -20,33 +20,31 @@ jobs:
           mkdir -p /tmp/jadx-bin /tmp/zona-jadx /tmp/zona-export
           curl -fsSL "$URL" -o /tmp/jadx.zip
           unzip -q /tmp/jadx.zip -d /tmp/jadx-bin
-      - name: Decompile APK
+      - name: Decompile and extract APK resources
         run: |
           set +e
-          /tmp/jadx-bin/bin/jadx --show-bad-code --deobf -d /tmp/zona-jadx zona5.apk >/tmp/jadx-native-config.log 2>&1
+          /tmp/jadx-bin/bin/jadx --show-bad-code --deobf -d /tmp/zona-jadx zona5.apk >/tmp/jadx-resource.log 2>&1
           exit 0
-      - name: Collect native config loader
+      - name: Collect exact resource factory
         run: |
-          mkdir -p /tmp/zona-export/callers /tmp/zona-export/models
-          grep -RIlE 'C16973X|m19462a|f59854f0|CppUtil|initApiConfig|m2185d' /tmp/zona-jadx/sources | while read -r src; do
-            rel=${src#/tmp/zona-jadx/sources/}
-            mkdir -p "/tmp/zona-export/callers/$(dirname "$rel")"
-            cp "$src" "/tmp/zona-export/callers/$rel"
-          done
-          for rel in p689mb/C16972W.java p689mb/C16973X.java p845wg/C19140H5.java mobi/zona/utils/CppUtil.java p179Jg/EnumC2623b.java p179Jg/C2631j.java p179Jg/C2616L.java; do
+          mkdir -p /tmp/zona-export/models /tmp/zona-export/apk-resources
+          for rel in p275P4/C4112o.java p689mb/C16953C.java p689mb/C16961K.java p689mb/C16972W.java; do
             src="/tmp/zona-jadx/sources/$rel"
             if [ -f "$src" ]; then mkdir -p "/tmp/zona-export/models/$(dirname "$rel")"; cp "$src" "/tmp/zona-export/models/$rel"; fi
           done
-          grep -RniE 'm19462a|f59854f0|CppUtil|initApiConfig|m2185d|https?://|assets|raw|resource' /tmp/zona-export > /tmp/zona-export/callsites.txt || true
-          cp /tmp/jadx-native-config.log /tmp/zona-export/jadx.log
+          unzip -l zona5.apk > /tmp/zona-export/apk-resources/list.txt
+          unzip -q zona5.apk 'composeResources/*' -d /tmp/apk-unpacked || true
+          if [ -d /tmp/apk-unpacked/composeResources ]; then cp -R /tmp/apk-unpacked/composeResources /tmp/zona-export/apk-resources/; fi
+          grep -RnaE 'api|config|mzona|zonasearch|http' /tmp/zona-export/apk-resources > /tmp/zona-export/resource-hits.txt || true
+          cp /tmp/jadx-resource.log /tmp/zona-export/jadx.log
       - name: Publish from latest branch head
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin chore/apk-analysis
-          rm -rf network-core-export/callers network-core-export/models network-core-export/callsites.txt
+          rm -rf network-core-export/models network-core-export/apk-resources network-core-export/resource-hits.txt
           mkdir -p network-core-export
           cp -R /tmp/zona-export/. network-core-export/
           git add -f network-core-export
-          git commit -m "analysis: export Zona native config loader [skip ci]" || exit 0
+          git commit -m "analysis: extract Zona builtin config resource [skip ci]" || exit 0
           git push origin HEAD:chore/apk-analysis
