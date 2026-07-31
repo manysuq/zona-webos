@@ -1,0 +1,45 @@
+name: Probe live Zona API
+on:
+  workflow_dispatch:
+  push:
+    paths: [".github/workflows/probe-zona-api.yml"]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/apk-analysis
+      - name: Probe hosts and request shapes
+        run: |
+          rm -rf api-probe-export && mkdir api-probe-export
+          NOW=$(date +%s%3N)
+          n=0
+          for host in https://api1.mzona.net https://api2.mzona.net https://apir0.mzona.net https://apir1.mzona.net https://apiw1.mzona.net https://sync.zonasearch.com; do
+            for params in '{"offset":0,"limit":5}' '{"page":{"offset":0,"size":5},"filter":{}}' '{"page":0,"pageSize":5}' '{}'; do
+              n=$((n+1));
+              file="api-probe-export/probe-$n.txt"
+              url="$host/getMovieIds"
+              {
+                echo "HOST=$host"
+                echo "PARAMS=$params"
+                curl -k -sS --max-time 12 --connect-timeout 5 -D - -G \
+                  -H 'Accept: application/json' \
+                  -H 'User-Agent: Mozilla/5.0 (Linux; Android 11; Android TV) Zona/3.0.65' \
+                  --data-urlencode "params=$params" \
+                  --data-urlencode "client_time=$NOW" \
+                  "$url" || true
+              } > "$file" 2>&1
+            done
+          done
+          grep -RniE 'HTTP/|HOST=|error|message|data|cloudflare|forbidden|unauthorized' api-probe-export > api-probe-export/summary.txt || true
+      - name: Publish
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f api-probe-export
+          git commit -m "analysis: record live Zona API probes [skip ci]" || exit 0
+          git push origin HEAD:chore/apk-analysis
