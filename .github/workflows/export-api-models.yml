@@ -1,0 +1,47 @@
+name: Export Zona API models
+on:
+  workflow_dispatch:
+  push:
+    paths: [".github/workflows/export-api-models.yml"]
+permissions:
+  contents: write
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/apk-analysis
+      - name: Install JADX
+        run: |
+          URL=$(curl -fsSL https://api.github.com/repos/skylot/jadx/releases/latest | jq -r '.assets[] | select(.name | test("^jadx-[0-9].*\\.zip$")) | .browser_download_url' | head -n1)
+          mkdir -p /tmp/jadx-bin /tmp/zona-jadx
+          curl -fsSL "$URL" -o /tmp/jadx.zip
+          unzip -q /tmp/jadx.zip -d /tmp/jadx-bin
+      - name: Decompile
+        run: |
+          set +e
+          /tmp/jadx-bin/bin/jadx --show-bad-code --deobf -d /tmp/zona-jadx zona5.apk >/tmp/jadx-api.log 2>&1
+          exit 0
+      - name: Export models and callers
+        run: |
+          rm -rf api-model-export
+          mkdir -p api-model-export
+          cp -R /tmp/zona-jadx/sources/p179Jg api-model-export/ 2>/dev/null || true
+          cp -R /tmp/zona-jadx/sources/p341Sg api-model-export/ 2>/dev/null || true
+          cp -R /tmp/zona-jadx/sources/p863xg api-model-export/ 2>/dev/null || true
+          mkdir -p api-model-export/metadata-callers
+          grep -RIl 'getMetadata' /tmp/zona-jadx/sources | while read -r src; do
+            rel=${src#/tmp/zona-jadx/sources/}
+            mkdir -p "api-model-export/metadata-callers/$(dirname "$rel")"
+            cp "$src" "api-model-export/metadata-callers/$rel"
+          done
+          grep -RniE 'getMetadata|GetPageParams|offset|limit|page|filter|entityId|link' api-model-export > api-model-export/references.txt || true
+      - name: Publish
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f api-model-export
+          git commit -m "analysis: export Zona API models [skip ci]" || exit 0
+          git push origin HEAD:chore/apk-analysis
