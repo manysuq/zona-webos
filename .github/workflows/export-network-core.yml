@@ -1,4 +1,4 @@
-name: Export Zona bootstrap callers
+name: Export Zona native config loader
 on:
   workflow_dispatch:
   push:
@@ -23,22 +23,22 @@ jobs:
       - name: Decompile APK
         run: |
           set +e
-          /tmp/jadx-bin/bin/jadx --show-bad-code --deobf -d /tmp/zona-jadx zona5.apk >/tmp/jadx-bootstrap.log 2>&1
+          /tmp/jadx-bin/bin/jadx --show-bad-code --deobf -d /tmp/zona-jadx zona5.apk >/tmp/jadx-native-config.log 2>&1
           exit 0
-      - name: Collect bootstrap, models and entity callers
+      - name: Collect native config loader
         run: |
           mkdir -p /tmp/zona-export/callers /tmp/zona-export/models
-          grep -RIlE 'm2185d|initApiConfig|Using builtin config|getMovieOrSerialById|m20535d' /tmp/zona-jadx/sources | while read -r src; do
+          grep -RIlE 'C16973X|m19462a|f59854f0|CppUtil|initApiConfig|m2185d' /tmp/zona-jadx/sources | while read -r src; do
             rel=${src#/tmp/zona-jadx/sources/}
             mkdir -p "/tmp/zona-export/callers/$(dirname "$rel")"
             cp "$src" "/tmp/zona-export/callers/$rel"
           done
-          for rel in p179Jg/EnumC2623b.java p179Jg/C2631j.java p179Jg/C2616L.java p464Zd/C6810h.java ru/zona/app/android/App.java; do
+          for rel in p689mb/C16972W.java p689mb/C16973X.java p845wg/C19140H5.java mobi/zona/utils/CppUtil.java p179Jg/EnumC2623b.java p179Jg/C2631j.java p179Jg/C2616L.java; do
             src="/tmp/zona-jadx/sources/$rel"
             if [ -f "$src" ]; then mkdir -p "/tmp/zona-export/models/$(dirname "$rel")"; cp "$src" "/tmp/zona-export/models/$rel"; fi
           done
-          grep -RniE 'm2185d|initApiConfig|builtin config|getMovieOrSerialById|m20535d|https?://' /tmp/zona-export > /tmp/zona-export/callsites.txt || true
-          cp /tmp/jadx-bootstrap.log /tmp/zona-export/jadx.log
+          grep -RniE 'm19462a|f59854f0|CppUtil|initApiConfig|m2185d|https?://|assets|raw|resource' /tmp/zona-export > /tmp/zona-export/callsites.txt || true
+          cp /tmp/jadx-native-config.log /tmp/zona-export/jadx.log
       - name: Publish from latest branch head
         run: |
           git config user.name "github-actions[bot]"
@@ -48,5 +48,5 @@ jobs:
           mkdir -p network-core-export
           cp -R /tmp/zona-export/. network-core-export/
           git add -f network-core-export
-          git commit -m "analysis: export builtin Zona bootstrap config [skip ci]" || exit 0
+          git commit -m "analysis: export Zona native config loader [skip ci]" || exit 0
           git push origin HEAD:chore/apk-analysis
