@@ -61,7 +61,16 @@ jobs:
         run: java -jar "$APKTOOL_JAR" d -f "$APK_PATH" -o "$OUT_DIR/apktool" > "$OUT_DIR/apktool.log" 2>&1
 
       - name: Decompile sources
-        run: jadx --show-bad-code --deobf -d "$OUT_DIR/jadx" "$APK_PATH" > "$OUT_DIR/jadx.log" 2>&1
+        run: |
+          set +e
+          jadx --show-bad-code --deobf -d "$OUT_DIR/jadx" "$APK_PATH" > "$OUT_DIR/jadx.log" 2>&1
+          JADX_EXIT=$?
+          echo "$JADX_EXIT" > "$OUT_DIR/jadx-exit-code.txt"
+          if [ "$JADX_EXIT" -ne 0 ]; then
+            echo "::warning::JADX finished with exit code $JADX_EXIT. Partial decompiled output will still be uploaded."
+            tail -n 100 "$OUT_DIR/jadx.log" || true
+          fi
+          exit 0
 
       - name: Create reports
         if: always()
@@ -74,6 +83,9 @@ jobs:
           grep -RniEI 'mzona|zonasearch|imgzona|zonapic|torrent|magnet|video|stream|player|kinopoisk' "$OUT_DIR/jadx/sources" "$OUT_DIR/apktool/assets" "$OUT_DIR/apktool/res" > "$OUT_DIR/zona-media-references.txt" 2>/dev/null
           echo "## Zona APK analysis" >> "$GITHUB_STEP_SUMMARY"
           echo "Download the zona-apk-analysis artifact from this run." >> "$GITHUB_STEP_SUMMARY"
+          if [ -f "$OUT_DIR/jadx-exit-code.txt" ]; then
+            echo "JADX exit code: $(cat "$OUT_DIR/jadx-exit-code.txt") (partial output is retained)." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Upload artifact
         if: always()
