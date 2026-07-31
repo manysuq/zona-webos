@@ -15,7 +15,17 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 APK = os.path.join(ROOT, 'zona5.apk')
 HOSTS = ('https://api1.mzona.net', 'https://apiw1.mzona.net')
 MOD = 65521
+MASK64 = 0xffffffffffffffff
 _cache = {}
+
+
+def signed32(value):
+    value &= 0xffffffff
+    return value - 0x100000000 if value & 0x80000000 else value
+
+
+def java_long(value):
+    return value & MASK64
 
 
 def zona_cookie(now_ms):
@@ -24,7 +34,7 @@ def zona_cookie(now_ms):
         a, b = 1, 0
         with open(APK, 'rb') as source:
             while True:
-                chunk = source.read(1024 * 1024)
+                chunk = source.read(2048)
                 if not chunk:
                     break
                 for value in chunk:
@@ -32,18 +42,18 @@ def zona_cookie(now_ms):
                     a = (a + ((signed + day) % 256)) % MOD
                     b = (b + a) % MOD
         _cache.clear()
-        _cache[day] = ((b << 16) + a) & 0xffffffffffffffff
+        _cache[day] = ((b << 16) + a) & MASK64
     checksum = _cache[day]
     seconds = (now_ms // 1000) & 0xffffffff
     mask = random.getrandbits(64)
     for bit in range(32):
-        target = 1 << (bit * 2 + 1)
+        shifted = signed32(1 << (((bit * 2) + 1) & 31))
+        promoted = java_long(shifted)
         if seconds & (1 << bit):
-            mask |= target
+            mask = java_long(mask | promoted)
         else:
-            mask &= ~target
+            mask = java_long(mask & java_long(signed32(~shifted)))
     mask &= ~0x100
-    mask &= 0xffffffffffffffff
     return struct.pack('>QQ', mask, checksum ^ mask).hex()
 
 
