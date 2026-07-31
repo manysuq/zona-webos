@@ -25,24 +25,28 @@ jobs:
           set +e
           /tmp/jadx-bin/bin/jadx --show-bad-code --deobf -d /tmp/zona-jadx zona5.apk >/tmp/jadx-bootstrap.log 2>&1
           exit 0
-      - name: Collect bootstrap and entity callers
+      - name: Collect bootstrap, models and entity callers
         run: |
-          mkdir -p /tmp/zona-export/callers
-          grep -RIlE 'm2185d|m20535d|getMovieIds|getSerialIds|getEntityById' /tmp/zona-jadx/sources | while read -r src; do
+          mkdir -p /tmp/zona-export/callers /tmp/zona-export/models
+          grep -RIlE 'm2185d|initApiConfig|Using builtin config|getMovieOrSerialById|m20535d' /tmp/zona-jadx/sources | while read -r src; do
             rel=${src#/tmp/zona-jadx/sources/}
             mkdir -p "/tmp/zona-export/callers/$(dirname "$rel")"
             cp "$src" "/tmp/zona-export/callers/$rel"
           done
-          grep -RniE 'm2185d|m20535d|getMovieIds|getSerialIds|getEntity|getMovie|getSerial|https?://' /tmp/zona-export/callers > /tmp/zona-export/callsites.txt || true
+          for rel in p179Jg/EnumC2623b.java p179Jg/C2631j.java p179Jg/C2616L.java p464Zd/C6810h.java ru/zona/app/android/App.java; do
+            src="/tmp/zona-jadx/sources/$rel"
+            if [ -f "$src" ]; then mkdir -p "/tmp/zona-export/models/$(dirname "$rel")"; cp "$src" "/tmp/zona-export/models/$rel"; fi
+          done
+          grep -RniE 'm2185d|initApiConfig|builtin config|getMovieOrSerialById|m20535d|https?://' /tmp/zona-export > /tmp/zona-export/callsites.txt || true
           cp /tmp/jadx-bootstrap.log /tmp/zona-export/jadx.log
       - name: Publish from latest branch head
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin chore/apk-analysis
-          rm -rf network-core-export/callers network-core-export/callsites.txt
+          rm -rf network-core-export/callers network-core-export/models network-core-export/callsites.txt
           mkdir -p network-core-export
           cp -R /tmp/zona-export/. network-core-export/
           git add -f network-core-export
-          git commit -m "analysis: export Zona bootstrap callers [skip ci]" || exit 0
+          git commit -m "analysis: export builtin Zona bootstrap config [skip ci]" || exit 0
           git push origin HEAD:chore/apk-analysis
